@@ -1,0 +1,213 @@
+layers = [imageInputLayer([28 28 1])
+          convolution2dLayer(5,20)
+          reluLayer
+          maxPooling2dLayer(2,'Stride',2)
+          fullyConnectedLayer(10)
+          softmaxLayer
+          classificationLayer()];  %+-3min
+with
+options = trainingOptions('sgdm','MaxEpochs',15, ...
+	'InitialLearnRate',0.0001,'OutputFcn',@plotTrainingAccuracy);  
+63sec
+Test Accuracy = 98.16%
+
+
+layers = [imageInputLayer([28 28 1])
+  convolution2dLayer(5,12)
+  reluLayer
+  
+  maxPooling2dLayer(2,'Stride',2)
+  
+  convolution2dLayer(5,24)
+  reluLayer  
+  
+  fullyConnectedLayer(10)
+  softmaxLayer
+  classificationLayer()]; %+-10min
+with
+options = trainingOptions('sgdm','MaxEpochs',15, ...
+	'InitialLearnRate',0.0001,'OutputFcn',@plotTrainingAccuracy);  
+64sec
+98.80%
+
+
+Higher minibatch sizes make the convergence slower, since it requires a similar number of steps as before but each step takes more time (actually less steps, but in terms of times it seems not worth it).
+Lower minibatch size, such as 32, provide a good accuracy in very very short times. Letting it run for the full 15 epochs takes of course a bit more time, but enables more GD steps and thus a better accuracy at the end. There are of course more oscillations in the process because of the lower batch size, one should not exaggerate in lowering this parameter.
+
+layers = [imageInputLayer([28 28 1])
+  convolution2dLayer(5,12)
+  reluLayer
+  
+  maxPooling2dLayer(2,'Stride',2)
+  
+  convolution2dLayer(5,24)
+  reluLayer  
+  
+  fullyConnectedLayer(10)
+  softmaxLayer
+  classificationLayer()]; %+-10min
+with
+options = trainingOptions('sgdm','MaxEpochs',15, ...
+    'MiniBatchSize', 32, ...
+	'InitialLearnRate',0.0001,'OutputFcn',@plotTrainingAccuracy);  
+    %Default MiniBatchSize is 128.
+102sec
+99.52%
+(99.80% with adam, even with 30 epochs)
+
+layers = [imageInputLayer([28 28 1])
+  convolution2dLayer(5,12)
+  reluLayer
+  
+  maxPooling2dLayer(2,'Stride',2)
+  
+  convolution2dLayer(5,24)
+  reluLayer  
+  
+  fullyConnectedLayer(10)
+  softmaxLayer
+  classificationLayer()]; %+-10min
+with
+options = trainingOptions('sgdm','MaxEpochs',15, ...
+    'MiniBatchSize', 4, ...
+	'InitialLearnRate',0.0001,'OutputFcn',@plotTrainingAccuracy);  
+    %Default MiniBatchSize is 128.
+510sec
+99.92%
+(484sec and 99.84% with adam)
+
+layers = [imageInputLayer([28 28 1])
+  convolution2dLayer(5,12)
+  reluLayer
+  
+  maxPooling2dLayer(2,'Stride',2)
+  
+  convolution2dLayer(5,24)
+  reluLayer  
+  
+  fullyConnectedLayer(10)
+  softmaxLayer
+  classificationLayer()]; %+-10min
+with
+options = trainingOptions('sgdm','MaxEpochs',30, ...
+    'MiniBatchSize', 32, ...
+	'InitialLearnRate',0.0001,'OutputFcn',@plotTrainingAccuracy);  
+    %Default MiniBatchSize is 128.
+272sec
+99.52%
+
+So actually the version with only 4 as batch size performs really really good. Of course one should watch elapsed time in order to compare these models. Anyway a partial explanation can be the slight randomization provided by following gradient directions from smaller batches.
+
+layers = [imageInputLayer([28 28 1])
+  convolution2dLayer(5,12)
+  reluLayer
+  
+  maxPooling2dLayer(2,'Stride',2)
+  
+  convolution2dLayer(5,24)
+  reluLayer  
+  
+  fullyConnectedLayer(10)
+  softmaxLayer
+  classificationLayer()]; %+-10min
+with
+options = trainingOptions('sgdm','MaxEpochs',60, ...
+    'MiniBatchSize', 32, ...
+	'InitialLearnRate',0.0001,'OutputFcn',@plotTrainingAccuracy);  
+    %Default MiniBatchSize is 128.
+495sec
+99.68%
+
+Back to smaller batches
+
+layers = [imageInputLayer([28 28 1])
+  convolution2dLayer(5,12)
+  reluLayer
+  
+  maxPooling2dLayer(2,'Stride',2)
+  
+  convolution2dLayer(5,24)
+  reluLayer  
+  
+  fullyConnectedLayer(10)
+  softmaxLayer
+  classificationLayer()]; %+-10min
+with
+options = trainingOptions('sgdm','MaxEpochs',5, ...
+    'MiniBatchSize', 2, ...
+	'InitialLearnRate',0.0001,'OutputFcn',@plotTrainingAccuracy);  
+    %Default MiniBatchSize is 128.
+401sec
+84.52%
+
+So, the batch here is too little, doens't actually converge.
+
+layers = [imageInputLayer([28 28 1])
+  convolution2dLayer(5,12)
+  reluLayer
+  
+  maxPooling2dLayer(2,'Stride',2)
+  
+  convolution2dLayer(5,24)
+  reluLayer  
+  
+  fullyConnectedLayer(10)
+  softmaxLayer
+  classificationLayer()]; %+-10min
+with
+options = trainingOptions('sgdm','MaxEpochs',5, ...
+    'MiniBatchSize', 4, ...
+	'InitialLearnRate',0.0001,'OutputFcn',@plotTrainingAccuracy);  
+    %Default MiniBatchSize is 128.
+343sec
+99.08%
+
+batch 128 30 epochs:
+134sec
+99.40%
+
+batch 128 90 epochs:
+404sec
+99.56%
+
+
+back to:
+layers = [imageInputLayer([28 28 1])
+          convolution2dLayer(5,20)
+          reluLayer
+          maxPooling2dLayer(2,'Stride',2)
+          fullyConnectedLayer(10)
+          softmaxLayer
+          classificationLayer()];  %+-3min
+batch 128, 15 epochs.
+
+Setting number of filters to 10 reduces performance to 97.64%
+to 40 -> 98.48%
+
+Back to 20, setting the filter to be 10x10 -> 99.32%
+now 40 10x10 filters, batch=4, 15 epochs -> 0%
+
+Adding more Conv layers implies the necessity of adding also maxpooling layers, and this reduces the input size so much that it becomes useless, and even bad actually. 2 Conv layers seems to be the best now. And in fact the digits are small images, with single channel, and present simple structures. If the first layer can identify blobs and edges, the second one is already enough to put them together and learn digits. The image structures to recognize are not complex enough to justify a usage of more than 2 Conv layers.
+
+layers = [imageInputLayer([28 28 1])
+          convolution2dLayer(5,20)
+          reluLayer
+          convolution2dLayer(5,24)
+          reluLayer 
+          maxPooling2dLayer(2,'Stride',2)
+          convolution2dLayer(3,36)
+          reluLayer 
+          fullyConnectedLayer(10)
+          softmaxLayer
+          classificationLayer()];  %+-3min
+batch 128, 60 epochs
+594sec
+99.40%
+
+using adam -> 589sec, 99.64%
+
+batch 32, 30 epochs, adam -> 412sec, 99.60%
+
+
+Using one CNN and then 2 fully connected layers (512 and 10 units) -> 99.40% with adam.
+Using 2 CNN and 2 fully conn (100 and 10) -> 99.64% with adam.

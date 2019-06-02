@@ -1,0 +1,49 @@
+First autoencoder 100 units, second 50. Same for MLPs:
+
+3 runs averages:
+meanTrainAcc1Hidden = 98.9480
+meanTestAcc1Hidden = 96.3920
+
+meanTrainAcc2Hidden = 99.0400
+meanTestAcc2Hidden = 96.6560
+
+meanTrainAcc_noFineTuning = 85.7880
+meanTestAcc_noFineTuning = 83.2640
+
+meanTrainAcc_fineTuned = 100
+meanTestAcc_fineTuned = 99.7640
+
+10 runs averages:
+meanTrainAcc1Hidden = 99.1720
+meanTestAcc1Hidden = 96.9740
+
+meanTrainAcc2Hidden = 99.0840
+meanTestAcc2Hidden = 96.8240
+
+
+
+Test performance greatly drops without finetuning if the number of units in the autoencoders is drecrease. With 70 in the first and 15 in the second, it gets to 39.6400. With fine tuning, though, it is still great: 99.1600, outperforming MLPs with much more units. With 10 units in the second it has similar results: 39.64 vs 99.68 with fine tuning.
+Even a single autoencoder with 50 units, if pretrained with unclassified data, performs much better than a straightforward NN! 100% on training set and 99.68% on test!
+2 Layers in the NN sometimes perform better than 1, some other overfit, but anyway perform worse than autoencoders: they constrain the parameters greatly reducing the model complexity in terms of VC dimension, because they're trained with unsupervised data, and provide a great starting point for the network.
+
+Best over 20 runs:
+1 layers 50 units -> 97.56 test
+2 layers 50 and 20 -> 97.46 test
+
+Best over 10 runs:
+3 Layers 100 and 50 and 20 -> 97.40 test
+
+Autoencoders 100 50:
+Sparsity regularization to 10 in the first -> 99.72 test
+Sparsity proportion to 0.05 in the first -> 99.16 test
+Sparsity proportion to 0.05 in both -> 92.76 test (with 11 before fine tuning -> really bad)
+Increasing the sparsity proportion to 0.3 in both -> 99.8 in test (with 84.88 before -> so good!)
+Same restults with sparsity proportion to 0.5 in both
+Sparsity proportion to 0.4 in both -> 99.86 in test (85.82 before tuning)
+Sparsity proportion to 0.4 in both and regularization to 3 and 6 -> 99.82 test 
+Also changes to weight regularization do not produce great variations.
+Best performances are around 99.80
+
+In this context, using more than 2 autoencoders doesn't seem to produce better results. Using only 1 isn't so bad, but not as good as 2 of them, it's actually pretty good though (99.6% on test, and also very high before fine tuning).
+
+Fine tuning is super important, but especially with multiple autoencoders, because with one, after its training, the output of the encoder is already a good representation of the input and can thus provide good results on softmax. The more autoencoders (and with less units) we use, the more important the fine tuning gets.
